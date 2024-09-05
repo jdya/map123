@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>Map of Sex Offenders by Region</title>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성범죄자 지역별 통계</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
-        #map { height: 600px; width: 100%; }
+        #map {
+            height: 600px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-    <h1>Sex Offenders Statistics by Region</h1>
+    <h1>성범죄자 지역별 통계</h1>
     <div id="map"></div>
+
     <script>
         // 지도 설정
         var map = L.map('map').setView([36.5, 127.5], 7);
@@ -22,7 +26,7 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // /locations API에서 데이터를 불러와 지도에 마커 표시
+        // 서버에서 성범죄자 데이터를 불러와 지도에 마커 표시
         fetch('/locations')
             .then(response => response.json())
             .then(data => {
