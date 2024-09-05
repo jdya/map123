@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Map of South Korea</title>
+    <title>Map of Sex Offenders by Region</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -11,13 +11,28 @@
     </style>
 </head>
 <body>
-    <h1>Map of South Korea</h1>
+    <h1>Sex Offenders Statistics by Region</h1>
     <div id="map"></div>
     <script>
-        var map = L.map('map').setView([36.5, 127.5], 7); // 대한민국 중심 좌표로 설정
+        // 지도 설정
+        var map = L.map('map').setView([36.5, 127.5], 7);
+
+        // 지도 타일 레이어 추가
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        // /locations API에서 데이터를 불러와 지도에 마커 표시
+        fetch('/locations')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(loc => {
+                    // 각 위치에 마커 추가, 성범죄자 수를 팝업으로 표시
+                    L.marker([loc.lat, loc.lng]).addTo(map)
+                        .bindPopup(`<b>${loc.name}</b><br>성범죄자 수: ${loc.count}`);
+                });
+            })
+            .catch(error => console.error('Error fetching location data:', error));
     </script>
 </body>
 </html>
