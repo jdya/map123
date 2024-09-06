@@ -33,34 +33,44 @@
             minLevel: 6
         });
 
-        // 서버에서 대기질 데이터를 가져와 지도에 마커로 표시
         fetch('/get_data')
             .then(response => response.json())
             .then(data => {
+                console.log('Fetched Data:', data);  // 데이터를 확인하는 로그
+
                 var markers = [];
                 data.forEach(function(loc) {
-                    var markerPosition = new kakao.maps.LatLng(loc.lat, loc.lng);
+                    if (loc.lat && loc.lng) {  // 위도와 경도가 있는지 확인
+                        var markerPosition = new kakao.maps.LatLng(loc.lat, loc.lng);
 
-                    // 마커 생성
-                    var marker = new kakao.maps.Marker({
-                        position: markerPosition
-                    });
-
-                    // 마커 클릭 이벤트로 인포윈도우 표시
-                    kakao.maps.event.addListener(marker, 'click', function() {
-                        var infowindow = new kakao.maps.InfoWindow({
-                            content: `<div><strong>${loc.stationName}</strong><br>미세먼지 수치: ${loc.pm10Value}</div>`
+                        // 마커 생성
+                        var marker = new kakao.maps.Marker({
+                            position: markerPosition
                         });
-                        infowindow.open(map, marker);
-                    });
 
-                    markers.push(marker);
+                        // 마커 클릭 이벤트로 인포윈도우 표시
+                        kakao.maps.event.addListener(marker, 'click', function() {
+                            var infowindow = new kakao.maps.InfoWindow({
+                                content: `<div><strong>${loc.stationName}</strong><br>미세먼지 수치: ${loc.pm10Value}</div>`
+                            });
+                            infowindow.open(map, marker);
+                        });
+
+                        markers.push(marker);  // 마커를 배열에 추가
+
+                        // 추가된 마커를 콘솔에 출력하여 확인
+                        console.log(`Marker added at ${loc.lat}, ${loc.lng}`);
+                    } else {
+                        console.warn('Invalid coordinates for station:', loc.stationName);
+                    }
                 });
 
                 // 클러스터러에 마커 추가
                 clusterer.addMarkers(markers);
+                console.log("Markers added to clusterer:", markers.length);  // 클러스터에 추가된 마커의 수 출력
             })
             .catch(error => console.error('Error fetching data:', error));
+
     </script>
 </body>
 </html>
