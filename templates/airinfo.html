@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대기질 정보 지도</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>서울 대기질 정보</h1>
+    <div id="map"></div>
+
+    <!-- 카카오 지도 API 스크립트 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e3c1e3c012f9997a3b479053ffbb4a0f&libraries=clusterer"></script>
+    <script>
+        var mapContainer = document.getElementById('map'), 
+            mapOption = { 
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 기준 좌표
+                level: 8
+            };
+
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        // 마커 클러스터러 생성
+        var clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            averageCenter: true,
+            minLevel: 6
+        });
+
+        // 서버에서 대기질 데이터를 가져와 지도에 마커로 표시
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(data => {
+                var markers = [];
+                data.forEach(function(loc) {
+                    var markerPosition = new kakao.maps.LatLng(loc.lat, loc.lng);
+
+                    // 마커 생성
+                    var marker = new kakao.maps.Marker({
+                        position: markerPosition
+                    });
+
+                    // 마커 클릭 이벤트로 인포윈도우 표시
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: `<div><strong>${loc.stationName}</strong><br>미세먼지 수치: ${loc.pm10Value}</div>`
+                        });
+                        infowindow.open(map, marker);
+                    });
+
+                    markers.push(marker);
+                });
+
+                // 클러스터러에 마커 추가
+                clusterer.addMarkers(markers);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
